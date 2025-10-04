@@ -15,7 +15,7 @@ var foo2 = function (param1) {
 var foo3 = (param1) => {
   console.log("Inside foo3 functionwith params as: ", param1);
 };
-
+ 
 // Anonymous function
 (param1) => {
   console.log("Inside foo4 functionwith params as: ", param1);

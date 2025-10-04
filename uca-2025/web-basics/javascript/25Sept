@@ -1,0 +1,913 @@
+
+🔹 1. Props in React
+	•	Props = properties (data passed from parent → child component).
+	•	Read-only / Immutable → once passed, you cannot modify them inside the child.
+	•	Purpose: configure a component when you use it.
+	•	Example:
+
+function Welcome(props) {
+  return <h1>Hello, {props.name}</h1>;
+}
+
+root.render(<Welcome name="Pragat" />);
+
+👉 props.name here is read-only. If you want to change it → use state.
+
+⸻
+
+🔹 2. Components = Building Blocks
+	•	Components are reusable UI pieces.
+	•	Think of them like LEGO blocks 🧱 → you combine them to make a bigger app.
+	•	Two types:
+	1.	Functional Components (modern standard)
+	2.	Class Components (older, less used now)
+
+✅ Reusable Component Example:
+
+function Button({ label }) {
+  return <button>{label}</button>;
+}
+
+// Reused multiple times
+function App() {
+  return (
+    <>
+      <Button label="Login" />
+      <Button label="Signup" />
+      <Button label="Logout" />
+    </>
+  );
+}
+
+👉 Same Button code, reused with different labels.
+This makes code readable and maintainable.
+
+❌ Non-reusable example: writing separate <button>Login</button> everywhere.
+
+⸻
+
+🔹 3. root.render()
+	•	You can pass only one root component into root.render().
+	•	But that root component can contain many children inside.
+
+Example:
+
+function App() {
+  return (
+    <div>
+      <DescriptionComponent name="React Props" />
+      <LikesComponent likes={10} />
+    </div>
+  );
+}
+
+root.render(<App />);
+
+
+⸻
+
+🔹 4. Example with Props + Function + LikesComponent
+
+function LikesComponent({ likes }) {
+  return (
+    <>
+      <p>Likes: {likes}</p>
+      <button>Like</button>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <h1>Description Component</h1>
+      <LikesComponent likes={5} />
+      <LikesComponent likes={10} />
+    </div>
+  );
+}
+
+root.render(<App />);
+
+👉 Here:
+	•	LikesComponent is reusable.
+	•	Props (likes={5} / likes={10}) configure each instance.
+
+⸻
+
+🔹 5. CSS Box Model (Quick Intro)
+
+Every HTML element is a box with 4 layers:
+
++--------------------------+
+|        Margin            |
+|  +--------------------+  |
+|  |      Border        |  |
+|  |  +--------------+  |  |
+|  |  |   Padding    |  |  |
+|  |  |  +--------+  |  |  |
+|  |  |  | Content |  |  |  |
+|  |  |  +--------+  |  |  |
+|  |  +--------------+  |  |
+|  +--------------------+  |
++--------------------------+
+
+	•	Content → text, image, etc.
+	•	Padding → space between content & border.
+	•	Border → boundary around padding.
+	•	Margin → space outside border (between elements).
+
+Example CSS:
+
+div {
+  margin: 20px;   /* space outside */
+  padding: 10px;  /* space inside */
+  border: 2px solid black;
+}
+
+
+⸻
+
+✅ In summary:
+	•	Props = immutable, parent → child data.
+	•	Components = building blocks (reusable, readable, composable).
+	•	root.render = only one root component (but it can nest many inside).
+	•	Box Model = how HTML elements’ spacing works.
+
+⸻if we want to update the ui using props 
+ normal old method 
+ like we havr to update the whole document ,get element by id
+ and then reupdate with a new value 
+
+ and 22ng method react has irtual dom 
+ method is that dont update in global variable
+ update on the state 
+ and it wil push that statew only using use stae
+
+ return 
+
+GitHub Copilot: 
+
+pragatmittal: if we want to update the ui using props 
+ normal old method 
+ like we havr to update the whole document ,get element by id
+ and then reupdate with a new value 
+
+ and 22ng method react has irtual dom 
+ method is that dont update in global variable
+ update on the state 
+ and it wil push that statew only using use stae
+
+ react .useState has two element 
+ react is already custom indepdent
+ use state is the methjod used for mananging the state componet returngin an array first elemnt is state itself and sevond id function whis is ued for mofiying the state 
+ 
+ function update likes in which button onCLick{setLikes} we only pass the referencing on  we want to call that (we are not sending th data ) 
+ update the ui ->  dyanamically values using wither use pros or state
+ out of that and it that dynamicaaly upodate react can't 
+dom behaviour cant changed
+question -> (So does it mean even after using the useState method, react is internally doing the same as we would do in normal JS, removing the element, updating and re inserting. Its just a shorter syntax ???????
+so basically its upadting the virtual dom not the actual dom and then the classic react way to batch all updates together than update the actual dom for optimization?????-> correct and also explain this
+ if there are more than one fun/property to update then for all diff batches will form and as use you settimeout they will go to high priority queue so how data will be changing in batches? like will there be also any priority list?????
+)
+javascript was capable of making delta updates -> but for that we have lots pf heavy work
+useCustomState Implementation from basic to complt
+
+to prvent multiole updates in virtual dom -> ot dpesnot udate immediately it is not asynchronous
+setTimeout()=>{clg();}e
+ should be short crisp and not longed
+
+useState is method but in reacyt it is called hoook
+definethat too?
+custom hooks 
+
+
+GitHub Copilot: Excellent questions! 🚀 Let me break down React's state management, Virtual DOM, and how it all works under the hood: 
+
+Created 5 todos
+
+Starting (1/5) *Explain Virtual DOM vs Real DOM*
+
+## 🔹 1. Virtual DOM vs Real DOM - The Big Picture
+
+**Your intuition is CORRECT!** ✅ React is still doing DOM manipulation internally, but it's **optimized** and **batched**.
+
+### Old Way (Vanilla JS):
+```javascript
+// Manual DOM manipulation - INEFFICIENT
+function updateLikes(newCount) {
+  document.getElementById('likes').textContent = newCount;
+  document.getElementById('counter').textContent = `Total: ${newCount}`;
+  // Each line = separate DOM operation = SLOW
+}
+
+// Multiple updates = Multiple DOM reflows
+updateLikes(5);
+updateLikes(6); 
+updateLikes(7);
+// 3 separate DOM updates = 3 browser reflows
+```
+
+### React Way (Virtual DOM):
+```javascript
+// React batches & optimizes
+const [likes, setLikes] = useState(0);
+
+function handleClick() {
+  setLikes(1);
+  setLikes(2); 
+  setLikes(3);
+  // Only 1 DOM update happens with final value: 3
+}
+```
+
+**The Magic:** 
+- React creates a "Virtual DOM" (JavaScript object tree)
+- Compares old vs new virtual trees (diffing)
+- Updates only the **changed parts** of real DOM
+- **Batches** multiple updates into one DOM operation 
+
+Starting (2/5) *Deep dive into useState Hook*
+
+## 🔹 2. useState Deep Dive
+
+### Structure:
+```javascript
+const [state, setState] = useState(initialValue);
+//     ↑      ↑
+//   value  setter function
+```
+
+### Key Points:
+1. **Returns Array** with 2 elements
+2. **setState is asynchronous** (doesn't update immediately)
+3. **Batching** - multiple setStates in same event = 1 update
+
+### Example - Batching in Action:
+```javascript
+function LikesComponent() {
+  const [likes, setLikes] = useState(0);
+  
+  function handleClick() {
+    console.log('Before:', likes); // 0
+    
+    setLikes(likes + 1); // Queued
+    setLikes(likes + 1); // Queued  
+    setLikes(likes + 1); // Queued
+    
+    console.log('After:', likes); // Still 0! (not updated yet)
+    
+    // React batches all 3 and only last one wins: 0 + 1 = 1
+  }
+  
+  return <button onClick={handleClick}>Likes: {likes}</button>;
+}
+```
+
+### Why This Happens:
+- `likes` is still `0` when all 3 `setLikes` run
+- React batches: `setLikes(0+1)`, `setLikes(0+1)`, `setLikes(0+1)`
+- Final result: `1` (not `3`)
+
+### To Fix - Use Functional Updates:
+```javascript
+function handleClick() {
+  setLikes(prev => prev + 1); // 0 + 1 = 1
+  setLikes(prev => prev + 1); // 1 + 1 = 2  
+  setLikes(prev => prev + 1); // 2 + 1 = 3
+  // Final result: 3 ✅
+}
+``` 
+
+Starting (3/5) *Create custom useState implementation*
+
+## 🔹 3. Custom useState Implementation
+
+Let me create a simplified version to show how it works: 
+
+Created [](file:///Users/pragatmittal/Desktop/Pragat/web_technologies/uca-2025/web-basics/javascript/custom-useState-demo.js)
+
+Starting (4/5) *Explain React Hooks concept*
+
+## 🔹 4. What are React Hooks?
+
+**Hook = Function that "hooks into" React features**
+
+### Why called "Hooks"?
+- They **hook** your functional components to React's lifecycle
+- Like fishing hooks 🎣 - they grab onto React's internal system
+- Before hooks, only Class components could use state/lifecycle
+
+### Rules of Hooks:
+1. ✅ Only call in functional components or custom hooks
+2. ✅ Only call at top level (not inside loops/conditions)
+3. ✅ Always call in same order
+
+### Built-in Hooks:
+```javascript
+// State management
+const [state, setState] = useState(initial);
+const [state, dispatch] = useReducer(reducer, initial);
+
+// Side effects  
+useEffect(() => {
+  // componentDidMount + componentDidUpdate
+}, [dependencies]);
+
+// Performance
+const memoized = useMemo(() => calculation, [deps]);
+const callback = useCallback(fn, [deps]);
+
+// References
+const ref = useRef(initialValue);
+```
+
+### Custom Hooks Example: 
+
+Created [](file:///Users/pragatmittal/Desktop/Pragat/web_technologies/uca-2025/web-basics/javascript/react-hooks-examples.js)
+
+Starting (5/5) *Show batching and priority queues*
+
+## 🔹 5. Batching & Priority Queues Deep Dive
+
+### Your Question About setTimeout Priority:
+**YES!** React has priority levels. Here's how it works: 
+
+Created [](file:///Users/pragatmittal/Desktop/Pragat/web_technologies/uca-2025/web-basics/javascript/react-batching-priority.js)
+
+Now let me run the custom useState demo to show you how it works: 
+
+Ran terminal command: cd /Users/pragatmittal/Desktop/Pragat/web_technologies/uca-2025/web-basics/javascript && node custom-useState-demo.js
+
+Completed (5/5) *Show batching and priority queues*
+
+## 🎯 **Summary - All Your Questions Answered:**
+
+### ✅ **1. Does React internally do the same DOM manipulation?**
+**YES** - but optimized! React still updates DOM, but:
+- **Batches** multiple updates → 1 DOM operation
+- **Diffs** Virtual DOM → only updates changed parts  
+- **Prioritizes** user interactions over background tasks
+
+### ✅ **2. Virtual DOM is just optimization?**
+**CORRECT!** Virtual DOM = JavaScript objects that:
+- Track what **should** be rendered
+- Compare with what **is** rendered (diffing)
+- Update only **differences** in real DOM
+- **Batch** updates for performance
+
+### ✅ **3. Multiple updates create batches with priorities?**
+**YES!** React's priority system:
+
+```javascript
+// High Priority (Immediate)
+onClick={() => setCount(1)}  // User interaction
+
+// Medium Priority (Normal)  
+fetch('/api').then(() => setState(data))  // Network response
+
+// Low Priority (Background)
+setTimeout(() => setAnalytics(data), 1000)  // Background task
+```
+
+**Processing Order:**
+1. **Immediate** → Process first
+2. **Normal** → Process after immediate
+3. **Background** → Process when browser is idle
+4. Within same priority → **Batched** together
+
+### ✅ **4. What are Hooks?**
+**Functions that "hook into" React features:**
+- `useState` → State management
+- `useEffect` → Lifecycle events  
+- Custom hooks → Reusable logic
+
+### ✅ **5. Why "Hooks"?**
+They **hook** functional components to React's internal system (like fishing hooks 🎣)
+
+---
+
+## 🔑 **Key Takeaways:**
+
+1. **React is still doing DOM manipulation** - just smarter
+2. **Virtual DOM = Performance optimization** through batching & diffing  
+3. **useState is asynchronous** - updates don't happen immediately
+4. **Batching prevents multiple re-renders** - improves performance
+5. **Priority system** ensures smooth user experience
+6. **Custom hooks = Reusable stateful logic**
+
+// 🔹 React Batching & Priority System Explained
+
+// React 18+ Priority Levels (Simplified)
+const PRIORITY_LEVELS = {
+  IMMEDIATE: 1,        // User input (click, type)
+  NORMAL: 2,          // Network responses
+  LOW: 3,             // Non-urgent updates
+  IDLE: 4             // Background tasks
+};
+
+// 🔹 Example 1: Normal Event Batching
+function BatchingExample() {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('');
+  
+  // All these updates will be BATCHED into 1 re-render
+  function handleClick() {
+    setCount(1);      // Queued
+    setCount(2);      // Queued  
+    setCount(3);      // Queued
+    setName('React'); // Queued
+    
+    // Only 1 re-render happens with final values: count=3, name='React'
+    console.log('Updates queued, but component not re-rendered yet');
+  }
+  
+  console.log('Rendering with:', count, name);
+  
+  return <button onClick={handleClick}>Click me</button>;
+}
+
+// 🔹 Example 2: setTimeout Breaks Batching (React 17)
+function SetTimeoutExample() {
+  const [count, setCount] = useState(0);
+  
+  function handleClick() {
+    // These are batched (1 re-render)
+    setCount(1);
+    setCount(2);
+    
+    // This breaks batching in React 17 (separate re-render)
+    setTimeout(() => {
+      setCount(3);  // Separate re-render
+      setCount(4);  // Another separate re-render  
+    }, 0);
+  }
+  
+  return <button onClick={handleClick}>Test Timeout</button>;
+}
+
+// 🔹 Example 3: React 18 Automatic Batching
+function React18Example() {
+  const [count, setCount] = useState(0);
+  
+  function handleClick() {
+    // React 18: ALL of these are batched!
+    setCount(1);
+    setCount(2);
+    
+    setTimeout(() => {
+      setCount(3);  // Still batched with others!
+      setCount(4);  // All updates = 1 re-render
+    }, 0);
+    
+    fetch('/api').then(() => {
+      setCount(5);  // Even async updates are batched!
+    });
+  }
+  
+  return <button onClick={handleClick}>React 18 Magic</button>;
+}
+
+// 🔹 Priority Queue Simulation
+class ReactPriorityScheduler {
+  constructor() {
+    this.queues = {
+      [PRIORITY_LEVELS.IMMEDIATE]: [],
+      [PRIORITY_LEVELS.NORMAL]: [],  
+      [PRIORITY_LEVELS.LOW]: [],
+      [PRIORITY_LEVELS.IDLE]: []
+    };
+    this.isFlushInProgress = false;
+  }
+  
+  scheduleUpdate(callback, priority = PRIORITY_LEVELS.NORMAL) {
+    this.queues[priority].push(callback);
+    
+    if (!this.isFlushInProgress) {
+      this.scheduleFlush();
+    }
+  }
+  
+  scheduleFlush() {
+    this.isFlushInProgress = true;
+    
+    // Use different scheduling for different priorities
+    if (this.queues[PRIORITY_LEVELS.IMMEDIATE].length > 0) {
+      // Immediate priority - sync execution
+      this.flushWork();
+    } else {
+      // Lower priority - async execution  
+      setTimeout(() => this.flushWork(), 0);
+    }
+  }
+  
+  flushWork() {
+    console.log('\n--- Processing Updates by Priority ---');
+    
+    // Process highest priority first
+    for (let priority = 1; priority <= 4; priority++) {
+      const queue = this.queues[priority];
+      
+      while (queue.length > 0) {
+        const callback = queue.shift();
+        console.log(`Executing priority ${priority} update`);
+        callback();
+      }
+    }
+    
+    this.isFlushInProgress = false;
+  }
+}
+
+// 🔹 Demo: Priority System
+const scheduler = new ReactPriorityScheduler();
+
+console.log('=== React Priority System Demo ===');
+
+// Schedule updates with different priorities
+scheduler.scheduleUpdate(
+  () => console.log('✅ Background task completed'), 
+  PRIORITY_LEVELS.IDLE
+);
+
+scheduler.scheduleUpdate(
+  () => console.log('🔄 Network response processed'), 
+  PRIORITY_LEVELS.NORMAL
+);
+
+scheduler.scheduleUpdate(
+  () => console.log('⚡ User click handled'), 
+  PRIORITY_LEVELS.IMMEDIATE
+);
+
+scheduler.scheduleUpdate(
+  () => console.log('📊 Analytics updated'), 
+  PRIORITY_LEVELS.LOW
+);
+
+// 🔹 Real React Behavior Example
+function RealReactExample() {
+  const [urgent, setUrgent] = useState(0);
+  const [background, setBackground] = useState(0);
+  
+  function handleUserAction() {
+    // High priority - user interaction
+    setUrgent(prev => prev + 1);
+    
+    // Low priority - background update
+    setTimeout(() => {
+      setBackground(prev => prev + 1);
+    }, 0);
+    
+    // In React 18: urgent update renders first,
+    // background update batched and rendered later
+  }
+  
+  return (
+    <div>
+      <p>Urgent: {urgent}</p>
+      <p>Background: {background}</p>
+      <button onClick={handleUserAction}>Update Both</button>
+    </div>
+  );
+}
+
+// 🔹 Batching Rules Summary:
+/*
+React 17:
+- ✅ Batches: Event handlers (onClick, onChange)  
+- ❌ Doesn't batch: setTimeout, Promises, native events
+
+React 18:
+- ✅ Batches: Everything automatically!
+- ✅ Priority-based: User interactions > Network > Background
+
+Priority Order:
+1. IMMEDIATE: User input (click, keyboard)
+2. NORMAL: State updates, network responses  
+3. LOW: Non-critical updates
+4. IDLE: Background tasks, analytics
+
+Multiple updates in same priority = 1 batch
+Different priorities = Separate batches, processed in order
+*/
+// 🔹 Custom Hooks Examples
+
+// Custom Hook 1: Counter Logic
+function useCounter(initialValue = 0) {
+  const [count, setCount] = useState(initialValue);
+  
+  const increment = () => setCount(prev => prev + 1);
+  const decrement = () => setCount(prev => prev - 1);
+  const reset = () => setCount(initialValue);
+  
+  return { count, increment, decrement, reset };
+}
+
+// Custom Hook 2: Local Storage State
+function useLocalStorage(key, initialValue) {
+  // Get initial value from localStorage or use default
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(`Error reading localStorage key "${key}":`, error);
+      return initialValue;
+    }
+  });
+  
+  // Return wrapped version of useState's setter function that persists to localStorage
+  const setValue = (value) => {
+    try {
+      // Allow value to be a function so we have same API as useState
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      console.error(`Error setting localStorage key "${key}":`, error);
+    }
+  };
+  
+  return [storedValue, setValue];
+}
+
+// Custom Hook 3: API Data Fetching
+function useApi(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [url]);
+  
+  return { data, loading, error };
+}
+
+// 🔹 Usage Examples in Components:
+
+// Using Custom Counter Hook
+function CounterComponent() {
+  const { count, increment, decrement, reset } = useCounter(10);
+  
+  return (
+    <div>
+      <h2>Count: {count}</h2>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+      <button onClick={reset}>Reset</button>
+    </div>
+  );
+}
+
+// Using Local Storage Hook  
+function UserPreferences() {
+  const [theme, setTheme] = useLocalStorage('theme', 'light');
+  const [language, setLanguage] = useLocalStorage('language', 'en');
+  
+  return (
+    <div>
+      <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+      
+      <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+        <option value="en">English</option>
+        <option value="es">Spanish</option>
+      </select>
+      
+      <p>Theme: {theme}, Language: {language}</p>
+    </div>
+  );
+}
+
+// Using API Hook
+function UserProfile({ userId }) {
+  const { data: user, loading, error } = useApi(`/api/users/${userId}`);
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!user) return <div>No user found</div>;
+  
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <p>Email: {user.email}</p>
+    </div>
+  );
+}
+
+// 🔹 Why Custom Hooks are Powerful:
+// 1. Reusable Logic - Write once, use anywhere
+// 2. Separation of Concerns - UI vs Business Logic  
+// 3. Easy Testing - Test hooks independently
+// 4. Clean Components - Components focus on rendering
+
+// Example: Before Custom Hooks (Messy)
+function MessyComponent() {
+  const [count, setCount] = useState(0);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'light';
+  });
+  
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+  
+  const increment = () => setCount(prev => prev + 1);
+  const decrement = () => setCount(prev => prev - 1);
+  
+  // Lots of logic mixed with UI...
+  return <div>/* JSX */</div>;
+}
+
+// After Custom Hooks (Clean)
+function CleanComponent() {
+  const { count, increment, decrement } = useCounter();
+  const [theme, setTheme] = useLocalStorage('theme', 'light');
+  
+  // Pure UI concerns only!
+  return <div>/* JSX */</div>;
+}
+// 🔹 Custom useState Implementation - Step by Step
+
+// Level 1: Basic useState
+let stateValue;
+let reRenderFunction;
+
+function useCustomState(initialValue) {
+  // Initialize only once
+  if (stateValue === undefined) {
+    stateValue = initialValue;
+  }
+  
+  function setState(newValue) {
+    stateValue = newValue;
+    // Trigger re-render (in real React, this updates Virtual DOM)
+    if (reRenderFunction) reRenderFunction();
+  }
+  
+  return [stateValue, setState];
+}
+
+// Level 2: With Batching (Simplified)
+class SimpleBatch {
+  constructor() {
+    this.updates = [];
+    this.isScheduled = false;
+  }
+  
+  scheduleUpdate(updateFn) {
+    this.updates.push(updateFn);
+    
+    if (!this.isScheduled) {
+      this.isScheduled = true;
+      // Batch all updates in next tick
+      setTimeout(() => {
+        this.flushUpdates();
+      }, 0);
+    }
+  }
+  
+  flushUpdates() {
+    this.updates.forEach(update => update());
+    this.updates = [];
+    this.isScheduled = false;
+  }
+}
+
+const batcher = new SimpleBatch();
+
+// Level 3: Advanced useState with Batching
+let componentState = {};
+let currentComponentId = 0;
+let hookIndex = 0;
+
+function useAdvancedState(initialValue) {
+  const currentIndex = hookIndex++;
+  const componentKey = `${currentComponentId}-${currentIndex}`;
+  
+  // Initialize state if doesn't exist
+  if (!(componentKey in componentState)) {
+    componentState[componentKey] = initialValue;
+  }
+  
+  const currentState = componentState[componentKey];
+  
+  function setState(newValueOrFunction) {
+    batcher.scheduleUpdate(() => {
+      const newValue = typeof newValueOrFunction === 'function' 
+        ? newValueOrFunction(componentState[componentKey])
+        : newValueOrFunction;
+        
+      componentState[componentKey] = newValue;
+      
+      // Trigger re-render
+      console.log(`State updated: ${componentKey} = ${newValue}`);
+      if (reRenderFunction) reRenderFunction();
+    });
+  }
+  
+  return [currentState, setState];
+}
+
+// 🔹 Demo Usage
+function simulateComponent() {
+  hookIndex = 0; // Reset hook index for each render
+  
+  const [count, setCount] = useAdvancedState(0);
+  const [name, setName] = useAdvancedState('Pragat');
+  
+  console.log(`Rendering: count=${count}, name=${name}`);
+  
+  return { count, setCount, name, setName };
+}
+
+// Set up re-render function
+reRenderFunction = () => {
+  console.log('\n--- Re-rendering Component ---');
+  simulateComponent();
+};
+
+// 🔹 Test the batching
+console.log('=== Testing Custom useState ===');
+
+const { count, setCount } = simulateComponent();
+
+console.log('\n--- Triggering Multiple Updates (Should Batch) ---');
+setCount(1);
+setCount(2);  
+setCount(prev => prev + 1); // This will be 2 + 1 = 3
+
+console.log('Updates queued, waiting for batch...');
+
+// After 1ms, batched updates will execute
+setTimeout(() => {
+  console.log('\n--- Final State ---');
+  console.log('All updates completed!');
+}, 100);
+
+// 🔹 Priority Queues Example
+console.log('\n=== Priority Queue Simulation ===');
+
+class PriorityUpdater {
+  constructor() {
+    this.syncUpdates = [];      // High priority
+    this.asyncUpdates = [];     // Low priority
+  }
+  
+  addSyncUpdate(fn) {
+    this.syncUpdates.push(fn);
+    this.flush();
+  }
+  
+  addAsyncUpdate(fn) {
+    this.asyncUpdates.push(fn);
+    setTimeout(() => this.flush(), 0);
+  }
+  
+  flush() {
+    // Process high priority first
+    while (this.syncUpdates.length > 0) {
+      const update = this.syncUpdates.shift();
+      update();
+    }
+    
+    // Then low priority
+    while (this.asyncUpdates.length > 0) {
+      const update = this.asyncUpdates.shift();
+      update();
+    }
+  }
+}
+
+const priorityUpdater = new PriorityUpdater();
+
+// Simulate different priority updates
+setTimeout(() => {
+  console.log('\n--- Testing Priority Updates ---');
+  
+  priorityUpdater.addAsyncUpdate(() => console.log('Low priority update 1'));
+  priorityUpdater.addSyncUpdate(() => console.log('HIGH PRIORITY UPDATE!'));
+  priorityUpdater.addAsyncUpdate(() => console.log('Low priority update 2'));
+  
+}, 200);

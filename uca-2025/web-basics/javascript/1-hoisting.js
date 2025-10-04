@@ -37,8 +37,8 @@ function foo() {
     var x = 2;
     let y = 3;
   }
-  console.log("var x after is: ", x);
-  console.log("let y after is: ", y);
+  console.log("var x after is: ", x);// 2
+  console.log("let y after is: ", y); // ReferenceError: y is not defined
 }
 
 function foo() {
